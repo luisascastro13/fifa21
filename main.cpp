@@ -1,10 +1,16 @@
-//bibliotecas
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <sstream>
- 
+#include <iomanip>
+
+//QUANTIDADE DE JOGADORES
+//tabela original: 18944
+#define QJ 18944
+#define PLAYERSFILE "players.csv"
+#define RATINGFILE "rating.csv"
+#define TAGSFILE "tags.csv"
+
 //estruturas
 #include "s_players.h"
 #include "s_ratings.h"
@@ -12,73 +18,123 @@
 
 using namespace std;
 
-
-//le o arquivo players.csv e salva na struct
+//FUNCOES
+//le o arquivo players.csv e salva no vetor de structs
 int read_players_csv();
-void print(vector <s_players> const &a);
+//exibe a lista dos jogadores (nome id)
+void print_players();
+//exibe a lista de jogadores com 
+void print_playerpos(s_players jog);
 
-//vetor global dos jogadores
-vector <s_players> players_array;
+
+ //array of jogadores structs
+s_players lista_jogadores[QJ];
  
 int main()
 {
 	read_players_csv();
-	
-	for(int i=0; i<5; i++){
-		print_players(players_array[i]);
-	}
+
+	print_players();
 	
 	return 0;
 }
- 
 
-//le o arquivo players.csv e salva na struct
+//le o arquivo players.csv e salva no vetor de structs
 int read_players_csv()
 {
-	string fname = "players.csv";
-	s_players p1;	
-	 
-	vector<vector<string> > content;
-	vector<string> row;
-	string line, word;
-	 
-	fstream file (fname.c_str(), ios::in);
-	if(file.is_open())
-	{
-		while(getline(file, line)){
-		row.clear();
-	 
-		stringstream str(line);
-	 
-		while(getline(str, word, ','))
-		row.push_back(word);
-		content.push_back(row);
+
+    ifstream inFile(PLAYERSFILE); //our file
+    string line;
+    int linenum = 0;
+
+    while (getline (inFile, line))
+    {
+
+		s_players jogador; //temp jogador struct for use in the while loop
+		vector<string> pp;
+
+        istringstream linestream(line);
+        string item;
+		
+		//ID 
+		getline(linestream, item, ',');
+		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
+		if(linenum > 0){
+			stringstream ss(item);
+			ss >> jogador.sofifa_id;
 		}
 
-	
-	}
-	else
-	cout<<"Could not open the file\n";
-	 
-	for(int i=0;i<content.size();i++){
-		for(int j=0;j<content[i].size();j++){
-			cout<<content[i][j]<<" ,";
-			switch(j){
-				case 0:
-					p1.sofifa_id = content[i][j] + 0;
-					break;
-				case 1:
-					p1.name = content[i][j];
-					break;
+		//NOME
+		getline(linestream, item, ',');	//convert to a string stream	
+		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
+		if(linenum > 0){
+			jogador.name = item;
+		}
 
+		// //verifica se existem ASPAS. se sim, significa que o array das posicoes tem mais de 1 posicao
+		getline(linestream, item, ',');
+		
+		if(item.front() == '"'){ //o jogador tem mais de uma posicao
+
+			item.erase(item.begin());	//remove as aspas		
+			pp.push_back(item);		 //pushback no vetor
+
+			do{
+				getline(linestream, item, ',');
+				
+				if (item.back() == '"'){
+					item.erase(item.end());	//remove as aspas
 				}
+				pp.push_back(item);
 
+			}while(item.back() != '"');
+
+		// 	// //le ate proxima virgula ate encontrar aspas no final do item
 		}
-		players_array.push_back(p1);
-		cout<<"\n";
-	}
- 
-return 0;
+		// //caso contrario, so existe 1 posicao.	
+		else{
+			pp.push_back(item);
+		}
+		
+		jogador.player_positions = pp;		
+
+		//add the new jogador data to the database
+		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
+		if(linenum > 0){
+			lista_jogadores[linenum-1] = jogador;
+		}		
+
+		linenum++;
+	}	
+
+    return 0;
 }
 
 
+void print_players(){
+	cout 	<< left << setw(7)  << "N"
+			<< left << setw(50) << "NOME"
+			<< left << setw(15) << "ID"
+			<< left << setw(15) << "POSICOES"
+			<< endl;
+
+	//output the jogadores data.
+	for(int i = 0; i < QJ; i++) 
+	{
+		cout 	<< left << setw(7)   << i+1
+				<< left << setw(50)  << lista_jogadores[i].name
+				<< left << setw(15)  << lista_jogadores[i].sofifa_id;
+		print_playerpos(lista_jogadores[i]);
+		cout << endl;
+	}
+}
+
+
+void print_playerpos(s_players jog){
+	vector<string> pp = jog.player_positions;
+	//output the players positions.	
+	for(int j =0 ; j < pp.size();j++){
+		cout << pp[j];
+	}
+
+}
