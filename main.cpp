@@ -7,12 +7,12 @@
 
 //CONSTANTES
 #define QJ 18944	//QUANTIDADE DE JOGADORES 	- tabela original: 18944
+#define QR 10000	//QUANTIDADE DE RATINGS 	- tabela original: 24188078       MINIRATING: 10000
 #define QT 364950 	//QUANTIDADE DE TAGS		- tabela original: 364950
-#define QR 24188078	//QUANTIDADE DE RATINGS 	- tabela original: 24188078
 
 //nome dos arquivos
 #define PLAYERSFILE "players.csv"
-#define RATINGFILE "rating.csv"
+#define RATINGSFILE "minirating.csv"
 #define TAGSFILE "tags.csv"
 
 //ESTRUTURAS
@@ -26,6 +26,9 @@ using namespace std;
 void read_players_csv(); 				//le o arquivo players.csv e salva no vetor de structs
 void print_players(); 					//exibe a lista dos jogadores (nome id)
 void print_playerpos(s_players jog); 	//exibe a lista de posicoes do jogador jog
+void read_ratings_csv();
+void print_ratings();
+
 void read_tags_csv();					//le arquivo tags.csv e salva no vetor de structs
 void print_tags();						//exibe a lista de tags (tag_id user_id sofifa_id tag)
 
@@ -45,6 +48,11 @@ int main()
 
 	read_tags_csv();
 	print_tags();
+	
+	cout << "######################" << endl;
+
+	read_ratings_csv();
+	print_ratings();
 
 	
 	return 0;
@@ -153,9 +161,68 @@ void print_playerpos(s_players jog){
 //##########################################
 //##########    I/O RATINGS	  ##############
 //##########################################
+void read_ratings_csv()
+{
+    ifstream inFile(RATINGSFILE); //our file
+    string line;
+    int linenum = 0;
 
+    while (getline (inFile, line))
+    {
+		s_ratings r; //temp rating struct for use in the while loop
+		
+        stringstream linestream(line);
+        string item;
+		
+		//USER_ID
+		getline(linestream, item, ',');
+		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
+		if(linenum > 0){
+			stringstream ss(item);
+			ss >> r.user_id;
+		}
 
-//todo
+		//SOFIFA_ID
+		getline(linestream, item, ',');	//convert to a string stream	
+		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
+		if(linenum > 0){
+			stringstream ss(item);
+			ss >> r.sofifa_id;
+			
+		}
+
+		// //verifica se existem ASPAS. se sim, significa que o array das posicoes tem mais de 1 posicao
+		getline(linestream, item, ',');
+		if(linenum > 0){
+			stringstream ss(item);
+			ss >> r.rating;
+		}
+	
+		//add the new jogador data to the database
+		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
+		if(linenum > 0){
+			lista_ratings[linenum-1] = r;
+		}		
+
+		linenum++;
+	}
+}
+
+void print_ratings(){
+	cout 	<< left << setw(10) << "USER_ID"
+			<< left << setw(10) << "SOFIFA_ID"
+			<< left << setw(10) << "RATING"
+			<< endl;
+
+	//output the ratings data.
+	for(int i = 0; i < QR; i++) 
+	{
+		cout 	<< left << setw(10) << lista_ratings[i].user_id
+				<< left << setw(10) << lista_ratings[i].sofifa_id
+				<< left << setw(10) << lista_ratings[i].rating
+				<< endl;
+	}
+}
 
 //##########################################
 //##########    I/O TAGS	  ##############
@@ -215,7 +282,7 @@ void print_tags(){
 			<< left << setw(50) << "TAG"
 			<< endl;
 
-	//output the jogadores data.
+	//output the tags data.
 	for(int i = 0; i < QT; i++) 
 	{
 		cout 	<< left << setw(10) << lista_tags[i].tag_id
