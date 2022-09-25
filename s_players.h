@@ -4,8 +4,8 @@
 using namespace std;
 struct s_players{
 	int  sofifa_id;
-	string name[50];
-	vector <char> player_positions;
+	string name;
+	vector <string> player_positions;
 	int  rating;
 	int  count;
 };
