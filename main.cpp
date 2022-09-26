@@ -15,6 +15,12 @@
 #define RATINGSFILE "minirating.csv"
 #define TAGSFILE "tags.csv"
 
+std::string playersFile()
+{
+    static std::string word("players.csv");
+    return word;
+}
+
 //ESTRUTURAS
 #include "s_players.h"
 #include "s_ratings.h"
@@ -24,7 +30,7 @@ using namespace std;
 
 // PROTOTIPOS DE FUNCOES
 void read_players_csv(); 				//le o arquivo players.csv e salva no vetor de structs
-void print_players(); 					//exibe a lista dos jogadores (nome id)
+void print_players(int qtd); 					//exibe a lista dos jogadores (nome id)
 void print_playerpos(s_players jog); 	//exibe a lista de posicoes do jogador jog
 void read_ratings_csv();
 void print_ratings();
@@ -41,18 +47,19 @@ s_tags lista_tags[QT];			//array de tags
 int main()
 {
 	//le os jogadores do CSV e exibe a lista de estruturas salvas
+
 	read_players_csv();
-	print_players();
+	print_players(20);
 
 	cout << "######################" << endl;
 
-	read_tags_csv();
-	print_tags();
+	//read_tags_csv();
+	//print_tags();
 
 	cout << "######################" << endl;
 
-	read_ratings_csv();
-	print_ratings();
+	//read_ratings_csv();
+	//print_ratings();
 
 
 	return 0;
@@ -65,7 +72,8 @@ int main()
 //le o arquivo players.csv e salva no vetor de structs
 void read_players_csv()
 {
-    ifstream inFile(PLAYERSFILE); //our file
+    ifstream inFile(PLAYERSFILE, ios_base::in);
+
     string line;
     int linenum = 0;
 
@@ -92,38 +100,51 @@ void read_players_csv()
 			jogador.name = item;
 		}
 
-		// //verifica se existem ASPAS. se sim, significa que o array das posicoes tem mais de 1 posicao
-		getline(linestream, item, ',');
+		//POSICAO
+		getline(linestream, item, ',');//tenta ler posicao
 
-		if(item.front() == '"'){ //o jogador tem mais de uma posicao
+        if(linenum > 0){
+            //verifica se existem ASPAS. se sim, significa que o array das posicoes tem mais de 1 posicao
+            if(item.front() == '"'){
 
-			item.erase(item.begin());	//remove as aspas
-			pp.push_back(item);		 //pushback no vetor
+                item.erase(item.begin());	//remove as aspas da primeira posicao
+                pp.push_back(item);		 //insere primeira posicao no vetor
 
-			do{
-				getline(linestream, item, ',');
 
-				if (item.back() == '"'){
-					//item.pop_back();	//remove as aspas
-					//item.erase( item.end()-1 );
-					item.erase(item.end());
-				}
-				pp.push_back(item);
+                //vai ler até a proxima ", ou seja, vai todas as posicoes, então vamos ter que tratar essa string depois
+                getline(linestream, item, '"');
 
-			}while(item.back() != '"');
+                char handle;
+                int index=0, lastIndex=0;
+                int tam = item.length();
+                string posicao;
 
-		// 	// //le ate proxima virgula ate encontrar aspas no final do item
-		}
-		// //caso contrario, so existe 1 posicao.
-		else{
-			pp.push_back(item);
-		}
+                do{
+                    handle = item[index];
+                    if (handle==' '){
+                        item.erase(item.begin());
+                    }
+                    if(handle==',' || index==tam-1){
+
+                        posicao = item.substr(lastIndex,index);
+                        lastIndex = index;
+                        pp.push_back(posicao);
+                        item.erase(lastIndex,index);
+                        tam = item.length();
+
+                    }
+                    index++;
+                }while(index<tam);
+            }
+            else{// //caso contrario, so existe 1 posicao.
+                pp.push_back(item);
+            }
 
 		jogador.player_positions = pp;
 
 		//add the new jogador data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
-		if(linenum > 0){
+		//if(linenum > 0){
 			lista_jogadores[linenum-1] = jogador;
 		}
 
@@ -131,7 +152,7 @@ void read_players_csv()
 	}
 }
 
-void print_players(){
+void print_players(int qtd){
 	cout 	<< left << setw(7)  << "N"
 			<< left << setw(50) << "NOME"
 			<< left << setw(15) << "ID"
@@ -139,7 +160,7 @@ void print_players(){
 			<< endl;
 
 	//output the jogadores data.
-	for(int i = 0; i < QJ; i++)
+	for(int i = 0; i < qtd; i++)
 	{
 		cout 	<< left << setw(7)   << i+1
 				<< left << setw(50)  << lista_jogadores[i].name
@@ -153,7 +174,7 @@ void print_playerpos(s_players jog){
 	vector<string> pp = jog.player_positions;
 	//output the players positions.
 	for(int j =0 ; j < pp.size();j++){
-		cout << pp[j];
+		cout << pp[j]<< " ";
 	}
 }
 
@@ -245,6 +266,7 @@ void read_tags_csv()
 
 		//USER_ID
 		getline(linestream, item, ',');
+
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
 		if(linenum > 0){
 			stringstream ss(item);
