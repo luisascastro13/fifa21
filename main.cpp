@@ -26,6 +26,8 @@ std::string playersFile()
 #include "s_ratings.h"
 #include "s_tags.h"
 
+#include "trie.cpp"
+
 using namespace std;
 
 // PROTOTIPOS DE FUNCOES
@@ -38,10 +40,14 @@ void print_ratings();
 void read_tags_csv();					//le arquivo tags.csv e salva no vetor de structs
 void print_tags();						//exibe a lista de tags (tag_id user_id sofifa_id tag)
 
+void save_as_trie();
+
 //VARIAVEIS GLOBAIS
 s_players lista_jogadores[QJ];	//array de jogadores structs
 s_ratings lista_ratings[QR];  	//array de ratings
 s_tags lista_tags[QT];			//array de tags
+
+Trie* tree;
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 int main()
@@ -49,7 +55,9 @@ int main()
 	//le os jogadores do CSV e exibe a lista de estruturas salvas
 
 	read_players_csv();
-	print_players(20);
+	//print_players(20);
+
+	save_as_trie();
 
 	cout << "######################" << endl;
 
@@ -150,6 +158,14 @@ void read_players_csv()
 
 		linenum++;
 	}
+}
+
+void save_as_trie(){
+    tree=new Trie();
+    for (int x=0;x<QJ;x++){
+        tree->insert(lista_jogadores[x].name);
+    }
+
 }
 
 void print_players(int qtd){
