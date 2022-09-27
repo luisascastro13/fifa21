@@ -47,7 +47,7 @@ s_players lista_jogadores[QJ];	//array de jogadores structs
 s_ratings lista_ratings[QR];  	//array de ratings
 s_tags lista_tags[QT];			//array de tags
 
-Trie* tree;
+struct TrieNode *root;
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 int main()
@@ -57,8 +57,9 @@ int main()
 	read_players_csv();
 	//print_players(20);
 
-	save_as_trie();
-
+	save_as_trie(); 
+	
+	
 	cout << "######################" << endl;
 
 	//read_tags_csv();
@@ -119,7 +120,7 @@ void read_players_csv()
                 pp.push_back(item);		 //insere primeira posicao no vetor
 
 
-                //vai ler até a proxima ", ou seja, vai todas as posicoes, então vamos ter que tratar essa string depois
+                //vai ler atï¿½ a proxima ", ou seja, vai todas as posicoes, entï¿½o vamos ter que tratar essa string depois
                 getline(linestream, item, '"');
 
                 char handle;
@@ -161,10 +162,11 @@ void read_players_csv()
 }
 
 void save_as_trie(){
-    tree=new Trie();
+	root = getNode();
     for (int x=0;x<QJ;x++){
-        tree->insert(lista_jogadores[x].name);
-    }
+		insert(root, lista_jogadores[x].name);
+		//cout << "\n" << lista_jogadores[x].name;
+	}
 
 }
 
