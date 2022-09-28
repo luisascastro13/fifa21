@@ -35,6 +35,7 @@ void read_tags_csv();					//le arquivo tags.csv e salva no vetor de structs
 void print_tags();						//exibe a lista de tags (tag_id user_id sofifa_id tag)
 
 void save_as_trie();
+void menu();
 
 //VARIAVEIS GLOBAIS
 s_players lista_jogadores[QJ];	//array de jogadores structs
@@ -51,7 +52,7 @@ int main()
 	read_players_csv();
 	//print_players(20);
 
-	save_as_trie(); 
+	save_as_trie();
 	
 	
 	cout << "######################" << endl;
@@ -66,14 +67,30 @@ int main()
 	//print_ratings();
 
 	//exemplo busca 1
-	vector<int> busca = search(root, "fabricio");
-
-	for (int x=0;x<busca.size();x++){
-		cout << "\n " << busca[x];
-	}
+	menu();
+	
 
 
 	return 0;
+}
+void menu (){
+	string comando;
+	string busca;
+	do{
+		cout << "Digite um comando para pesquisa ou -1 para sair: \n";
+		cin >> comando;
+		//std::getline(std::cin, busca);
+		if (!comando.compare("player")){
+			
+			vector<int> res= search(root, busca);
+
+			for (int x=0;x<res.size();x++){
+				cout << "\n " << res[x];
+			}
+
+		}
+
+	}while(comando.compare("-1")!=0);
 }
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
