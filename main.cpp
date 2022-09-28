@@ -15,12 +15,6 @@
 #define RATINGSFILE "minirating.csv"
 #define TAGSFILE "tags.csv"
 
-std::string playersFile()
-{
-    static std::string word("players.csv");
-    return word;
-}
-
 //ESTRUTURAS
 #include "s_players.h"
 #include "s_ratings.h"
@@ -62,6 +56,7 @@ int main()
 	
 	cout << "######################" << endl;
 
+	
 	//read_tags_csv();
 	//print_tags();
 
@@ -69,6 +64,13 @@ int main()
 
 	//read_ratings_csv();
 	//print_ratings();
+
+	//exemplo busca 1
+	vector<int> busca = search(root, "fabricio");
+
+	for (int x=0;x<busca.size();x++){
+		cout << "\n " << busca[x];
+	}
 
 
 	return 0;
@@ -164,7 +166,7 @@ void read_players_csv()
 void save_as_trie(){
 	root = getNode();
     for (int x=0;x<QJ;x++){
-		insert(root, lista_jogadores[x].name);
+		insert(root, lista_jogadores[x]);
 		//cout << "\n" << lista_jogadores[x].name;
 	}
 
@@ -196,7 +198,9 @@ void print_playerpos(s_players jog){
 	}
 }
 
+void print_pesquisa_1(string consulta){
 
+}
 //##########################################
 //##########    I/O RATINGS	  ##############
 //##########################################
