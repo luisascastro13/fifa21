@@ -11,9 +11,9 @@
 #define QT 364950 	//QUANTIDADE DE TAGS		- tabela original: 364950
 
 //nome dos arquivos
-#define PLAYERSFILE "players.csv"
-#define RATINGSFILE "minirating.csv"//"rating.csv"
-#define TAGSFILE "tags.csv"
+#define PLAYERSFILE "base/players.csv"
+#define RATINGSFILE "base/minirating.csv"//"rating.csv"
+#define TAGSFILE "base/tags.csv"
 
 //ESTRUTURAS
 #include "s_players.h"
@@ -29,7 +29,7 @@ using namespace std;
 void read_players_csv(); 				//le o arquivo players.csv e salva no vetor de structs
 void print_cabecalho();
 void print_player(s_players player);
-void print_players(int qtd, vector<s_players> lista); 					//exibe a lista dos jogadores (nome id)
+void print_players(vector<s_players> lista); //exibe uma lista dos jogadores (nome id)
 void print_playerpos(s_players jog); 	//exibe a lista de posicoes do jogador jog
 void read_ratings_csv();
 void print_ratings();
@@ -39,6 +39,8 @@ void print_tags();						//exibe a lista de tags (tag_id user_id sofifa_id tag)
 
 void save_as_trie();
 void menu();
+
+void print_busca2(vector<s_ratings> res);
 
 //VARIAVEIS GLOBAIS
 vector<s_players> lista_jogadores;//[QJ];	//array de jogadores structs
@@ -57,7 +59,7 @@ int main()
 	read_players_csv();
 	save_as_trie();
 	//read_tags_csv();
-	//read_ratings_csv();
+	read_ratings_csv();
 
 	//table(QJ);
 	for (int i=0;i<lista_jogadores.size();i++){
@@ -107,8 +109,12 @@ void menu (){
 			//print lista aqui
 		}
 		else if (!comando.substr(0,4).compare("user")){
+			cout << "entrou ";
+			busca = comando.substr(5,comando.length()-5);
 			vector<s_ratings> res = getUserRatings(lista_ratings,stoi(busca));//,108952);
 			ordenaRatings(res);
+			cout << " resw size "<< res.size();
+			print_busca2(res);
 			//print lista com max 20 aqui
 		}
 		//else if (comando.substring())...
@@ -124,6 +130,26 @@ void menu (){
 }
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+void print_busca2(vector<s_ratings> res){
+	cout 	<< left << setw(15) << "\nSOFIFA_ID"
+			<< left << setw(50) << "NAME"	
+			<< left << setw(10) << "G_RATING"
+			<< left << setw(10) << "COUNT"		
+			<< left << setw(20) << "U_RATING"
+			<< endl;
+	s_players player;
+
+	for(int i=0; i<res.size() && i<20;i++){
+		player = table.searchItem(res[i].sofifa_id);
+		cout	<< left << setw(15) << player.sofifa_id
+				<< left << setw(50) << player.name
+				<< left << setw(10) << player.rating
+				<< left << setw(10) << player.count
+				<< left << setw(10) << res[i].rating
+				<<endl;
+	}
+	
+}
 
 
 //##########################################
@@ -222,10 +248,10 @@ void save_as_trie(){
 
 }
 
-void print_players(int qtd, vector <s_players> lista){
-	
+void print_players(vector <s_players> lista){
+	print_cabecalho();
 	//output the jogadores data.
-	for(int i = 0; i < qtd; i++)
+	for(int i = 0; i < lista.size(); i++)
 	{
 		print_player(lista[i]);		
 		print_playerpos(lista[i]);

@@ -46,7 +46,7 @@ void Hash::insertItem(s_players player)
     table[index].push_back(player);
 }
 
-s_players Hash::searchItem(int key)
+s_players Hash::searchItem(int key)//sofifa_id
 {
   // get the hash index of key
   int index = hashFunction(key);
@@ -58,8 +58,7 @@ s_players Hash::searchItem(int key)
       break;
   }
  
-  // if key is found in hash table, returns 
-  //if (i != table[index].end())
+  // if key is found in hash table, returns it
     return (*i);
 
 }
