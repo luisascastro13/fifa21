@@ -37,10 +37,12 @@ void print_tags();						//exibe a lista de tags (tag_id user_id sofifa_id tag)
 void save_as_trie();
 void menu();
 
+void ordenaRatings(vector<s_ratings>& vet);
+
 //VARIAVEIS GLOBAIS
-s_players lista_jogadores[QJ];	//array de jogadores structs
-s_ratings lista_ratings[QR];  	//array de ratings
-s_tags lista_tags[QT];			//array de tags
+vector<s_players> lista_jogadores;//[QJ];	//array de jogadores structs
+vector <s_ratings> lista_ratings;//[QR];  	//array de ratings
+vector<s_tags> lista_tags;//[QT];			//array de tags
 
 struct TrieNode *root;
 
@@ -49,10 +51,10 @@ int main()
 {
 	//le os jogadores do CSV e exibe a lista de estruturas salvas
 
-	read_players_csv();
+	//read_players_csv();
 	//print_players(20);
 
-	save_as_trie();
+	//save_as_trie();
 	
 	
 	cout << "######################" << endl;
@@ -63,13 +65,12 @@ int main()
 
 	cout << "######################" << endl;
 
-	//read_ratings_csv();
+	read_ratings_csv();
 	//print_ratings();
 
-	//exemplo busca 1
-	menu();
-	
+	cout << "######################" << endl;
 
+	menu();
 
 	return 0;
 }
@@ -79,6 +80,7 @@ void menu (){
 	do{
 		cout << "Digite um comando para pesquisa ou -1 para sair: \n";
 		cin >> comando;
+		cin >> busca;
 		//std::getline(std::cin, busca);
 		if (!comando.compare("player")){
 			
@@ -89,10 +91,17 @@ void menu (){
 			}
 
 		}
+		else if (!comando.compare("user")){
+			vector<s_ratings> res = getUserRatings(lista_ratings,stoi(busca));//,108952);
+			ordenaRatings(res);
+			//print lista aqui
+		}
 
 	}while(comando.compare("-1")!=0);
 }
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 //##########################################
 //##########    I/O PLAYERS   ##############
@@ -173,7 +182,8 @@ void read_players_csv()
 		//add the new jogador data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
 		//if(linenum > 0){
-			lista_jogadores[linenum-1] = jogador;
+			//lista_jogadores[linenum-1] = jogador;
+			lista_jogadores.push_back(jogador);
 		}
 
 		linenum++;
@@ -215,9 +225,6 @@ void print_playerpos(s_players jog){
 	}
 }
 
-void print_pesquisa_1(string consulta){
-
-}
 //##########################################
 //##########    I/O RATINGS	  ##############
 //##########################################
@@ -258,10 +265,11 @@ void read_ratings_csv()
 			ss >> r.rating;
 		}
 
-		//add the new jogador data to the database
+		//add the new rating data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
 		if(linenum > 0){
-			lista_ratings[linenum-1] = r;
+			//lista_ratings[linenum-1] = r;
+			lista_ratings.push_back(r);
 		}
 
 		linenum++;
@@ -329,7 +337,8 @@ void read_tags_csv()
 		//add the new tag data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
 		if(linenum > 0){
-			lista_tags[linenum-1] = t;
+			//lista_tags[linenum-1] = t;
+			lista_tags.push_back(t);
 		}
 
 		linenum++;

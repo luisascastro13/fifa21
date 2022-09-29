@@ -1,5 +1,3 @@
-// C++ implementation of search and insert
-// operations on Trie
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
