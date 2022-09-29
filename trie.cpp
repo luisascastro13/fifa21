@@ -35,7 +35,11 @@ struct TrieNode *getNode(void)
  
 
 int getCharIndex(char caracter){
-    if (caracter==' '){
+    if (caracter>='A' && caracter <='z'){
+        caracter=tolower(caracter);
+        return caracter-'a';
+    }
+    else if (caracter==' '){
         return 27;
     }else if(caracter=='-'){
         return 28;
@@ -45,11 +49,7 @@ int getCharIndex(char caracter){
         return 30;
     }else if(caracter=='"'){
         return 31;
-    }
-    else if (caracter>='A' && caracter <='z'){
-        caracter=tolower(caracter);
-        return caracter-'a';
-    }
+    }    
     else{
         return 32;
     }
