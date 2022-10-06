@@ -13,10 +13,11 @@
 //#define QR 24188078 
 #define QT 364950 	//QUANTIDADE DE TAGS		- tabela original: 364950
 #define PRIMO 22739
+#define COUNT_MAIOR 2//quantidade de avalaiaçõ pra pesquisa 3
 
 //nome dos arquivos
 #define PLAYERSFILE "base/players.csv"
-#define RATINGSFILE "base/rating.csv"//"rating.csv"
+#define RATINGSFILE "base/minirating.csv"
 //#define RATINGSFILE "rating.csv"
 #define TAGSFILE "base/tags.csv"
 
@@ -56,7 +57,7 @@ vector <s_ratings> lista_ratings;//[QR];  	//array de ratings
 vector<s_tags> lista_tags;//[QT];			//array de tags
 
 struct TrieNode *root;
-Hash table(PRIMO);
+Hash table(QJ);
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 int main()
@@ -132,7 +133,7 @@ void menu (){
 			vector<s_players> tabela;
 
 			tabela = table.returnList(); //toda a lista de jogadores com seus counts
-			p = getPlayersMaiorMil(tabela,2); //procura jogadores que tem count > 1000
+			p = getPlayersMaiorMil(tabela,COUNT_MAIOR); //procura jogadores que tem count > 1000
 			p = getPlayerWithPosition(p, posicao); //procura jogadores que tem a posicao
 			ordenaPlayersPorRating(p); //ordena pelo rating
 			print_busca3(p,stoi(topN)); //imprime somente o topN necessario			
