@@ -4,15 +4,20 @@
 #include <string>
 #include <iomanip>
 #include <cstring>
+#include <list> 
 
+///Users/ldecastro/Desktop/pessoal/UFRGS/3osem/CPD/projetofinal/fifa21-main/main.cpp
 //CONSTANTES
 #define QJ 18944	//QUANTIDADE DE JOGADORES 	- tabela original: 18944
 #define QR 10000//24188078	//QUANTIDADE DE RATINGS 	- tabela original: 24188078       MINIRATING: 
+//#define QR 24188078 
 #define QT 364950 	//QUANTIDADE DE TAGS		- tabela original: 364950
+#define PRIMO 22739
 
 //nome dos arquivos
 #define PLAYERSFILE "base/players.csv"
-#define RATINGSFILE "base/minirating.csv"//"rating.csv"
+#define RATINGSFILE "base/rating.csv"//"rating.csv"
+//#define RATINGSFILE "rating.csv"
 #define TAGSFILE "base/tags.csv"
 
 //ESTRUTURAS
@@ -22,6 +27,7 @@
 
 #include "trie.cpp"
 #include "hash.cpp"
+#include "split.cpp"
 
 using namespace std;
 
@@ -33,14 +39,16 @@ void print_players(vector<s_players> lista); //exibe uma lista dos jogadores (no
 void print_playerpos(s_players jog); 	//exibe a lista de posicoes do jogador jog
 void read_ratings_csv();
 void print_ratings();
-
 void read_tags_csv();					//le arquivo tags.csv e salva no vetor de structs
 void print_tags();						//exibe a lista de tags (tag_id user_id sofifa_id tag)
+void print_playertags(s_players player);
 
 void save_as_trie();
 void menu();
 
 void print_busca2(vector<s_ratings> res);
+void print_busca3(vector <s_players> lista, int l);
+void print_busca4(vector <s_players> lista);
 
 //VARIAVEIS GLOBAIS
 vector<s_players> lista_jogadores;//[QJ];	//array de jogadores structs
@@ -48,43 +56,35 @@ vector <s_ratings> lista_ratings;//[QR];  	//array de ratings
 vector<s_tags> lista_tags;//[QT];			//array de tags
 
 struct TrieNode *root;
-Hash table(QJ);
+Hash table(PRIMO);
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 int main()
 {
 	clock_t t;
-	//le os jogadores do CSV e exibe a lista de estruturas salvas
+	//le os jogadores do CSV e salva na arvore trie
 	t = clock();
-	read_players_csv();
+	read_players_csv();	
 	save_as_trie();
-	//read_tags_csv();
-	read_ratings_csv();
 
-	//table(QJ);
+	//table(QJ); salva na tabela hash
 	for (int i=0;i<lista_jogadores.size();i++){
 		table.insertItem(lista_jogadores[i]);	
 	}
-	
+	//le ratings e tags e atualiza os valores
 
+	read_ratings_csv();
+	read_tags_csv();
 	t = clock() - t;
 
 	cout << "Time: " << ((double)t)/(CLOCKS_PER_SEC);
-
 	cout << "\n######################" << endl;
-
-	//print_players(20);
-	
+	//print_players(20);	
 	cout << "######################" << endl;
-	
 	//print_tags();
-
-	cout << "######################" << endl;
-	
+	cout << "######################" << endl;	
 	//print_ratings();
-
 	cout << "######################" << endl;
-
 	menu();
 
 	return 0;
@@ -92,7 +92,7 @@ int main()
 void menu (){
 	string comando, busca;
 	do{
-		cout << "Digite um comando para pesquisa ou -1 para sair: \n";
+		cout << "\nDigite um comando para pesquisa ou -1 para sair: \n";
 		std::getline(std::cin, comando);
 
 		if (!comando.substr(0,6).compare("player")){
@@ -106,29 +106,77 @@ void menu (){
 				print_player(player);
 				print_playerpos(player);
 			}
-			//print lista aqui
 		}
 		else if (!comando.substr(0,4).compare("user")){
-			cout << "entrou ";
 			busca = comando.substr(5,comando.length()-5);
-			vector<s_ratings> res = getUserRatings(lista_ratings,stoi(busca));//,108952);
+			vector<s_ratings> res = getUserRatings(lista_ratings,stoi(busca));
 			ordenaRatings(res);
-			cout << " resw size "<< res.size();
-			print_busca2(res);
-			//print lista com max 20 aqui
+			print_busca2(res);//PRINT BUSCA COM MAX 20
 		}
-		//else if (comando.substring())...
-		//else if...
-		/*else if (comando.compare("-1")==0){
+		else if (!comando.substr(0,3).compare("top")){
+			string top = comando.substr(3, comando.length()-3);
+			split(comando, ' ');
+			//TOP N
+			string topN = strings[0];
+			topN.erase(topN.begin());
+			topN.erase(topN.begin());
+			topN.erase(topN.begin()); //remove a palavra top
+
+			//POSICAO
+			string posicao = strings[1];
+			posicao.erase(posicao.begin());
+			posicao.erase(posicao.size()-1); //remove as aspas da posicao
+
+			//procurar jogadores que tenham essa posicao E count > 1000
+			vector<s_players> p;
+			vector<s_players> tabela;
+
+			tabela = table.returnList(); //toda a lista de jogadores com seus counts
+			p = getPlayersMaiorMil(tabela,2); //procura jogadores que tem count > 1000
+			p = getPlayerWithPosition(p, posicao); //procura jogadores que tem a posicao
+			ordenaPlayersPorRating(p); //ordena pelo rating
+			print_busca3(p,stoi(topN)); //imprime somente o topN necessario			
+		}
+		else if(!comando.substr(0,4).compare("tags")){
+			string top = comando.substr(4, comando.length()-4);
+
+			split(comando, ' ');
+
+			//salva as tags em um vetor
+			vector<string> tagsPesquisa;
+			for(int x=1; x<max;x++){
+				if(strings[x]!= ""){
+					string tag = strings[x];
+					tag.erase(tag.begin());
+					tag.erase(tag.end() - 1); //remove as aspas da tag
+					
+					tagsPesquisa.push_back(tag);
+				}
+			}
+						
+			vector<s_players> tabela = table.returnList(); //toda a lista de jogadores
+
+			vector<s_players> pTags = playersWithAllTags(tabela, tagsPesquisa);
+
+			print_busca4(pTags);
+
+				
+		}		
+		else if (comando.compare("-1")==0){
 			break;
 		}
 		else{
 			cout << "\nHouve um erro de digitação... Digite novamente: ";
-		}*/
+		}
 
 	}while(comando.compare("-1")!=0);
 }
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+//##########################################
+//##########   PRINT BUSCAS   ##############
+//##########################################
 
 void print_busca2(vector<s_ratings> res){
 	cout 	<< left << setw(15) << "\nSOFIFA_ID"
@@ -151,7 +199,27 @@ void print_busca2(vector<s_ratings> res){
 	
 }
 
+void print_busca3(vector <s_players> lista, int l){
+	print_cabecalho();
+	//output the jogadores data.
+	for(int i = 0; i < lista.size() && i < l; i++)
+	{
+		print_player(lista[i]);		
+		print_playerpos(lista[i]);
+		cout << endl;
+	}
+}
 
+void print_busca4(vector <s_players> lista){
+	print_cabecalho();
+	//output the jogadores data.
+	for(int i = 0; i < lista.size(); i++)
+	{
+		print_player(lista[i]);		
+		print_playerpos(lista[i]);
+		cout << endl;
+	}
+}
 //##########################################
 //##########    I/O PLAYERS   ##############
 //##########################################
@@ -228,6 +296,9 @@ void read_players_csv()
 
 		jogador.player_positions = pp;
 
+		jogador.count=0;
+		jogador.rating=0;
+
 		//add the new jogador data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
 		//if(linenum > 0){
@@ -243,7 +314,6 @@ void save_as_trie(){
 	root = getNode();
     for (int x=0;x<QJ;x++){
 		insert(root, lista_jogadores[x]);
-		//cout << "\n" << lista_jogadores[x].name;
 	}
 
 }
@@ -284,6 +354,16 @@ void print_playerpos(s_players jog){
 	cout << endl;
 }
 
+void print_playertags(s_players player){
+	vector<string> pp = player.player_tags;
+	//output the players positions.
+	for(int j =0 ; j < pp.size();j++){
+		cout << pp[j]<< " ";
+	}
+	cout << endl;
+}
+
+
 //##########################################
 //##########    I/O RATINGS	  ##############
 //##########################################
@@ -313,8 +393,7 @@ void read_ratings_csv()
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
 		if(linenum > 0){
 			stringstream ss(item);
-			ss >> r.sofifa_id;
-
+			ss >> r.sofifa_id;					
 		}
 
 		// //verifica se existem ASPAS. se sim, significa que o array das posicoes tem mais de 1 posicao
@@ -322,7 +401,11 @@ void read_ratings_csv()
 		if(linenum > 0){
 			stringstream ss(item);
 			ss >> r.rating;
+				
+			table.updateCount(table.searchItem(r.sofifa_id).sofifa_id);
+			table.updateRating(table.searchItem(r.sofifa_id).sofifa_id, r.rating);
 		}
+	
 
 		//add the new rating data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)
@@ -330,7 +413,6 @@ void read_ratings_csv()
 			//lista_ratings[linenum-1] = r;
 			lista_ratings.push_back(r);
 		}
-
 		linenum++;
 	}
 }
@@ -387,11 +469,11 @@ void read_tags_csv()
 			ss >> t.sofifa_id;
 		}
 
-		// //verifica se existem ASPAS. se sim, significa que o array das posicoes tem mais de 1 posicao
+		//TAGS
 		getline(linestream, item, ',');
 		t.tag = item;
-		//t.tag = item;
-		//strcpy(t.tag, item);
+
+		table.updateTag(t.sofifa_id, t.tag);
 
 		//add the new tag data to the database
 		//se nao for a primeira linha do CSV (pq eh o nome das colunas)

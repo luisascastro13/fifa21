@@ -41,5 +41,3 @@ void ordenaRatings(vector<s_ratings>& vet){ //shell sort
 		h= (h-1)/3; //knuth
     }		
 }
-
-
