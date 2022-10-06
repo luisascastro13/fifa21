@@ -67,9 +67,9 @@ s_players Hash::searchItem(int key)//sofifa_id
 
 vector<s_players> Hash::returnList(){
   vector<s_players> res;
-  int index = hashFunction(QJ);
+  int index = hashFunction(PRIMO);
   list <s_players> :: iterator i;
-  for(int a=0; a < QJ; a++){
+  for(int a=0; a < PRIMO; a++){
     int index = hashFunction(a);
     for (i = table[index].begin();i != table[index].end(); i++) {
       s_players p = (*i);

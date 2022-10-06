@@ -17,8 +17,8 @@
 
 //nome dos arquivos
 #define PLAYERSFILE "base/players.csv"
-#define RATINGSFILE "base/minirating.csv"
-//#define RATINGSFILE "rating.csv"
+//#define RATINGSFILE "base/minirating.csv"
+#define RATINGSFILE "rating.csv"
 #define TAGSFILE "base/tags.csv"
 
 //ESTRUTURAS
@@ -57,7 +57,7 @@ vector <s_ratings> lista_ratings;//[QR];  	//array de ratings
 vector<s_tags> lista_tags;//[QT];			//array de tags
 
 struct TrieNode *root;
-Hash table(QJ);
+Hash table(PRIMO);
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 int main()
@@ -96,7 +96,7 @@ void menu (){
 		cout << "\nDigite um comando para pesquisa ou -1 para sair: \n";
 		std::getline(std::cin, comando);
 
-		if (!comando.substr(0,6).compare("player")){
+		if (!comando.substr(0,6).compare("player")){//comando player id
 			busca = comando.substr(7,comando.length()-7);
 			vector<int> res= search(root, busca);
 
@@ -108,7 +108,7 @@ void menu (){
 				print_playerpos(player);
 			}
 		}
-		else if (!comando.substr(0,4).compare("user")){
+		else if (!comando.substr(0,4).compare("user")){//comando user id
 			busca = comando.substr(5,comando.length()-5);
 			vector<s_ratings> res = getUserRatings(lista_ratings,stoi(busca));
 			ordenaRatings(res);
